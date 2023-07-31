@@ -20,7 +20,7 @@ _protobuf_commit=fde7cf7
 _zipcode_rel=202104
 
 _pkgbase=mozc
-pkgname=fcitx-mozc
+pkgname=fcitx-mozc-w-emacs
 pkgdesc="Fcitx Module of A Japanese Input Method for Chromium OS, Windows, Mac and Linux (the Open Source Edition of Google Japanese Input)"
 pkgver=2.26.4360.102.gca82d39
 pkgrel=2
@@ -30,7 +30,7 @@ license=('custom')
 depends=('qt5-base' 'fcitx')
 makedepends=('pkg-config' 'python' 'curl' 'gtk2' 'mesa' 'subversion' 'ninja' 'git' 'clang' 'python-six')
 replaces=('mozc-fcitx')
-conflicts=('mozc' 'mozc-server' 'mozc-utils-gui' 'mozc-fcitx' 'fcitx5-mozc')
+conflicts=('mozc' 'mozc-server' 'mozc-utils-gui' 'mozc-fcitx' 'fcitx5-mozc' 'fcitx-mozc')
 source=(git+https://github.com/fcitx/mozc.git#commit=${_mozc_commit}
         https://osdn.net/projects/ponsfoot-aur/storage/mozc/jigyosyo-${_zipcode_rel}.zip
         https://osdn.net/projects/ponsfoot-aur/storage/mozc/x-ken-all-${_zipcode_rel}.zip
@@ -103,7 +103,7 @@ build() {
 
   cd mozc/src
 
-  _targets="server/server.gyp:mozc_server gui/gui.gyp:mozc_tool unix/fcitx/fcitx.gyp:fcitx-mozc"
+  _targets="server/server.gyp:mozc_server gui/gui.gyp:mozc_tool unix/fcitx/fcitx.gyp:fcitx-mozc unix/emacs/emacs.gyp:mozc_emacs_helper"
 
   QTDIR=/usr GYP_DEFINES="document_dir=/usr/share/licenses/$pkgname use_libzinnia=1" python build_mozc.py gyp
   python build_mozc.py build -c $_bldtype $_targets
@@ -118,6 +118,7 @@ package() {
   export PREFIX="${pkgdir}/usr"
   export _bldtype
   ../scripts/install_server
+  install -D -m 755 "out_linux/${_bldtype}/mozc_emacs_helper" "${pkgdir}/usr/bin/mozc_emacs_helper"
 
   install -d "${pkgdir}/usr/share/licenses/$pkgname/"
   install -m 644 LICENSE data/installer/*.html "${pkgdir}/usr/share/licenses/${pkgname}/"
